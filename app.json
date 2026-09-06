@@ -1,0 +1,68 @@
+{
+  "expo": {
+    "name": "SOGN SAFE VESSEL",
+    "slug": "sogn-safe-vessel",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "sognsafevessel",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#070B10"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "no.hvl.sognsafe.vessel",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSMicrophoneUsageDescription": "SOGN SAFE VESSEL uses the microphone so the captain can report the situation by voice.",
+        "NSSpeechRecognitionUsageDescription": "SOGN SAFE VESSEL turns the captain's speech into text. Typed reporting still works if this is denied."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#070B10"
+      },
+      "package": "no.hvl.sognsafe.vessel",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 280,
+          "resizeMode": "contain",
+          "backgroundColor": "#070B10"
+        }
+      ],
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "SOGN SAFE VESSEL uses the microphone so the captain can report the situation by voice.",
+          "speechRecognitionPermission": "SOGN SAFE VESSEL turns the captain's speech into text. Typed reporting still works if this is denied."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "00000000-0000-0000-0000-000000000001"
+      }
+    }
+  }
+}
