@@ -15,7 +15,11 @@ type RecognitionCtor = new () => {
   lang: string;
   interimResults: boolean;
   continuous: boolean;
-  onresult: ((event: { results: ArrayLike<{ 0: { transcript: string }; isFinal?: boolean }> }) => void) | null;
+  maxAlternatives?: number;
+  onresult: ((event: {
+    resultIndex: number;
+    results: ArrayLike<{ 0: { transcript: string }; isFinal?: boolean }>;
+  }) => void) | null;
   onerror: ((event: { error?: string }) => void) | null;
   onend: (() => void) | null;
   start: () => void;
@@ -43,6 +47,7 @@ interface ActiveSession {
 
 let session: ActiveSession | null = null;
 let onPartial: ((text: string) => void) | null = null;
+let keepListening = false;
 
 const getNativeSpeech = (): NativeSpeechModule | null => {
   if (Platform.OS === 'web') {
@@ -67,8 +72,21 @@ const getWebRecognition = (): RecognitionCtor | null => {
   return speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition ?? null;
 };
 
+const restartWebRecognition = (recognition: InstanceType<RecognitionCtor>): boolean => {
+  if (!keepListening || !session) {
+    return false;
+  }
+  try {
+    recognition.start();
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 export const startListening = async (callbacks: { onPartial?: (text: string) => void } = {}): Promise<void> => {
   onPartial = callbacks.onPartial ?? null;
+  keepListening = true;
   const native = getNativeSpeech();
   if (native?.isRecognitionAvailable()) {
     const permission = await native.requestPermissionsAsync();
@@ -94,7 +112,7 @@ export const startListening = async (callbacks: { onPartial?: (text: string) => 
         session?.resolveStop?.(session.finalText || session.chunks.at(-1) || '');
       }) as (payload: never) => void)
     );
-    native.start({ lang: 'en-US', interimResults: true, continuous: false, addsPunctuation: true });
+    native.start({ lang: 'en-US', interimResults: true, continuous: true, addsPunctuation: true });
     return;
   }
 
@@ -105,28 +123,49 @@ export const startListening = async (callbacks: { onPartial?: (text: string) => 
   const recognition = new Recognition();
   recognition.lang = 'en-US';
   recognition.interimResults = true;
-  recognition.continuous = false;
+  recognition.continuous = true;
+  recognition.maxAlternatives = 1;
   session = { provider: 'web-speech', recognition, chunks: [], finalText: '' };
   recognition.onresult = (event) => {
-    const last = event.results[event.results.length - 1];
-    if (!last) {
+    if (!session) {
       return;
     }
-    const text = last[0].transcript;
-    session?.chunks.push(text);
-    onPartial?.(text);
-    if (last.isFinal) {
-      session!.finalText = text;
+    let interim = '';
+    for (let index = event.resultIndex; index < event.results.length; index += 1) {
+      const piece = event.results[index];
+      if (!piece) {
+        continue;
+      }
+      const text = piece[0].transcript;
+      if (piece.isFinal) {
+        session.finalText = `${session.finalText} ${text}`.trim();
+        session.chunks.push(text);
+      } else {
+        interim += text;
+      }
+    }
+    onPartial?.(session.finalText || interim);
+  };
+  recognition.onerror = (event) => {
+    if (event.error === 'no-speech' || event.error === 'aborted') {
+      return;
+    }
+    if (event.error === 'not-allowed') {
+      keepListening = false;
     }
   };
   recognition.onend = () => {
-    session?.resolveStop?.(session.finalText || session.chunks.at(-1) || '');
+    if (session?.recognition && restartWebRecognition(session.recognition)) {
+      return;
+    }
+    session?.resolveStop?.(session.finalText || session.chunks.join(' ').trim() || '');
   };
   recognition.start();
 };
 
 export const stopListening = async (): Promise<SpeechResult> => {
   const current = session;
+  keepListening = false;
   if (!current) {
     return { text: '', provider: 'none' };
   }
@@ -138,7 +177,7 @@ export const stopListening = async (): Promise<SpeechResult> => {
     } catch {
       // Already stopped.
     }
-    setTimeout(() => resolve(current.finalText || current.chunks.at(-1) || ''), 1200);
+    setTimeout(() => resolve(current.finalText || current.chunks.join(' ').trim() || ''), 1400);
   });
   current.subscriptions?.forEach((sub) => sub.remove());
   session = null;
@@ -147,6 +186,7 @@ export const stopListening = async (): Promise<SpeechResult> => {
 };
 
 export const cancelListening = async (): Promise<void> => {
+  keepListening = false;
   session?.subscriptions?.forEach((sub) => sub.remove());
   session?.recognition?.abort();
   try {

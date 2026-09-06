@@ -91,15 +91,18 @@ const styles = StyleSheet.create({
   event: {
     color: Color.text,
     fontFamily: Type.display,
-    fontSize: 34,
-    lineHeight: 36,
+    fontSize: 28,
+    lineHeight: 32,
     marginTop: 4,
+    flexShrink: 1,
   },
   message: {
     color: Color.textSecondary,
     fontFamily: Type.body,
     marginTop: 10,
     fontSize: 15,
+    lineHeight: 20,
+    flexShrink: 1,
   },
   meta: {
     marginTop: 16,

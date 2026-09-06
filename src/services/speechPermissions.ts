@@ -11,7 +11,20 @@ export const SPEECH_PERMISSION_COPY =
 
 export const requestSpeechPermissions = async (): Promise<SpeechPermissionState> => {
   if (Platform.OS === 'web') {
-    return 'granted';
+    if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+      return typeof window !== 'undefined' &&
+        ((window as typeof window & { webkitSpeechRecognition?: unknown }).webkitSpeechRecognition ||
+          (window as typeof window & { SpeechRecognition?: unknown }).SpeechRecognition)
+        ? 'granted'
+        : 'denied';
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach((track) => track.stop());
+      return 'granted';
+    } catch {
+      return 'denied';
+    }
   }
 
   try {

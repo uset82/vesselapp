@@ -13,7 +13,7 @@ export default function MessagesScreen() {
   const { history, conversation } = useVessel();
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
       <GlassAtmosphere>
       <View style={styles.page}>
         <Text style={styles.title}>OPERATIONAL LOG</Text>
@@ -40,6 +40,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
     paddingTop: 10,
+    paddingBottom: 0,
     gap: 10,
   },
   title: {

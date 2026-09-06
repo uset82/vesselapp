@@ -44,21 +44,24 @@ export const TelemetryGrid: React.FC<{ vessel: VesselContext; clock: string }> =
 const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 6,
   },
   tile: {
-    flex: 1,
-    minHeight: 76,
+    flexGrow: 1,
+    flexBasis: '30%',
+    minWidth: 104,
+    minHeight: 72,
   },
   tileInner: {
-    minHeight: 76,
+    minHeight: 72,
     padding: 8,
     justifyContent: 'space-between',
   },
   label: {
     color: Color.textMuted,
     fontFamily: Type.displayMedium,
-    fontSize: 8,
+    fontSize: 9,
     letterSpacing: 0.5,
     marginTop: 4,
   },
@@ -70,7 +73,8 @@ const styles = StyleSheet.create({
   value: {
     color: Color.text,
     fontFamily: Type.bodyMedium,
-    fontSize: 10,
+    fontSize: 12,
+    flexShrink: 1,
   },
   dot: {
     width: 6,

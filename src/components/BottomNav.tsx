@@ -1,5 +1,6 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Color, Type } from '../theme/tokens';
 import { GlassSurface } from './GlassSurface';
 import { HomeIcon, MenuIcon, MessagesIcon } from './icons/BridgeIcons';
@@ -12,6 +13,7 @@ interface BottomNavProps {
 }
 
 export const BottomNav: React.FC<BottomNavProps> = ({ active, onHome, onMessages, onMore }) => {
+  const insets = useSafeAreaInsets();
   const items = [
     { key: 'home' as const, label: 'Home', onPress: onHome, icon: HomeIcon },
     { key: 'messages' as const, label: 'Log', onPress: onMessages, icon: MessagesIcon },
@@ -19,7 +21,11 @@ export const BottomNav: React.FC<BottomNavProps> = ({ active, onHome, onMessages
   ];
 
   return (
-    <GlassSurface tone="strong" radius={20} style={styles.bar}>
+    <GlassSurface
+      tone="strong"
+      radius={20}
+      style={{ marginBottom: Math.max(insets.bottom, Platform.OS === 'web' ? 12 : 4) }}
+    >
       <View style={styles.row}>
         {items.map((item) => {
           const selected = item.key === active;
@@ -44,9 +50,6 @@ export const BottomNav: React.FC<BottomNavProps> = ({ active, onHome, onMessages
 };
 
 const styles = StyleSheet.create({
-  bar: {
-    marginBottom: 4,
-  },
   row: {
     flexDirection: 'row',
     paddingTop: 4,

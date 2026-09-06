@@ -9,6 +9,7 @@ import { MicrophoneIcon } from './icons/BridgeIcons';
 interface MicButtonProps {
   state: CaptainInteractionState;
   partial: string;
+  compact?: boolean;
   onPress: () => void;
   onCancel: () => void;
 }
@@ -32,9 +33,10 @@ const labelFor = (state: CaptainInteractionState, partial: string): string => {
   return 'TALK TO SOGN';
 };
 
-export const MicButton: React.FC<MicButtonProps> = ({ state, partial, onPress, onCancel }) => {
+export const MicButton: React.FC<MicButtonProps> = ({ state, partial, compact, onPress, onCancel }) => {
   const listening = state === 'LISTENING';
   const pulse = useSharedValue(1);
+  const size = compact ? 118 : Touch.mic;
 
   useEffect(() => {
     pulse.value = listening ? withRepeat(withTiming(1.06, { duration: 900 }), -1, true) : withTiming(1, { duration: 180 });
@@ -46,22 +48,22 @@ export const MicButton: React.FC<MicButtonProps> = ({ state, partial, onPress, o
 
   return (
     <View style={styles.wrap}>
-      <Animated.View style={[styles.halo, ringStyle, listening && styles.haloLive]} />
+      <Animated.View style={[styles.halo, { width: size + 18, height: size + 18 }, ringStyle, listening && styles.haloLive]} />
       <Pressable
         onPress={onPress}
         accessibilityRole="button"
         accessibilityLabel={listening ? 'Stop listening' : 'Talk to SOGN'}
-        style={({ pressed }) => [styles.hit, pressed && styles.pressed]}
+        style={({ pressed }) => [styles.hit, { width: size, height: size }, pressed && styles.pressed]}
       >
         <LinearGradient colors={['#E8EEF4', '#8B949E', '#C5CDD6']} start={{ x: 0.2, y: 0 }} end={{ x: 0.9, y: 1 }} style={styles.bezel}>
           <View style={[styles.inner, listening && styles.innerLive]}>
-            <View style={styles.core}>
-              <MicrophoneIcon size={34} color={Color.text} />
+            <View style={[styles.core, compact && styles.coreCompact]}>
+              <MicrophoneIcon size={compact ? 28 : 34} color={Color.text} />
             </View>
           </View>
         </LinearGradient>
       </Pressable>
-      <Text style={styles.talk}>{labelFor(state, partial)}</Text>
+      <Text style={[styles.talk, compact && styles.talkCompact]}>{labelFor(state, partial)}</Text>
       <Text style={styles.hint}>{listening ? 'Tap again to send' : 'Tell me what is happening.'}</Text>
       {listening ? (
         <Pressable onPress={onCancel} accessibilityRole="button" accessibilityLabel="Cancel listening" style={styles.cancel}>
@@ -87,9 +89,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(63, 174, 108, 0.2)',
   },
   hit: {
-    width: Touch.mic,
-    height: Touch.mic,
     borderRadius: 999,
+  },
+  coreCompact: {
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+  },
+  talkCompact: {
+    marginTop: 10,
+    fontSize: 20,
   },
   pressed: {
     opacity: 0.88,

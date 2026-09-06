@@ -44,12 +44,14 @@ const styles = StyleSheet.create({
   },
   copy: {
     flex: 1,
+    minWidth: 0,
   },
   title: {
     color: Color.text,
     fontFamily: Type.display,
-    fontSize: 20,
-    letterSpacing: 0.8,
+    fontSize: 18,
+    letterSpacing: 0.6,
+    flexShrink: 1,
   },
   sub: {
     color: Color.textSecondary,

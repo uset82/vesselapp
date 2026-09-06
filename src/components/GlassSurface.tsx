@@ -26,7 +26,17 @@ export const GlassSurface: React.FC<GlassSurfaceProps> = ({
   return (
     <View style={[styles.wrap, { borderRadius: radius, borderColor: signal || Color.hairline }, style]}>
       {Platform.OS === 'web' ? (
-        <View style={[styles.webGlass, { backgroundColor: fill, borderRadius: radius }]} />
+        <View
+          style={[
+            styles.webGlass,
+            {
+              backgroundColor: fill,
+              borderRadius: radius,
+              backdropFilter: 'blur(22px) saturate(1.45)',
+              WebkitBackdropFilter: 'blur(22px) saturate(1.45)',
+            } as ViewStyle,
+          ]}
+        />
       ) : (
         <BlurView intensity={intensity} tint="dark" style={[StyleSheet.absoluteFill, { borderRadius: radius }]} />
       )}
@@ -47,13 +57,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 10 },
   },
   webGlass: {
-    ...StyleSheet.absoluteFillObject,
-    // @ts-expect-error web-only material
-    backdropFilter: 'blur(22px) saturate(1.45)',
-    WebkitBackdropFilter: 'blur(22px) saturate(1.45)',
+    ...StyleSheet.absoluteFill,
   },
   specular: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     borderWidth: 1,
     borderColor: Color.specular,
     opacity: 0.22,

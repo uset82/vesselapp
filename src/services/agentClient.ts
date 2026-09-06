@@ -62,7 +62,7 @@ export const requestAgentSpeech = async (
   language: 'en' | 'no' = 'en'
 ): Promise<{ audioBase64: string; mimeType: string } | null> => {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 8000);
+  const timer = setTimeout(() => controller.abort(), 15000);
   try {
     const response = await fetch(`${getAgentUrl()}/api/audio/speech`, {
       method: 'POST',

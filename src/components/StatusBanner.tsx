@@ -18,10 +18,16 @@ const toneFor = (vessel: VesselContext, interaction: CaptainInteractionState) =>
   return { label: 'NORMAL', detail: 'Vessel reporting active', color: Color.green };
 };
 
-export const StatusBanner: React.FC<{ vessel: VesselContext; interaction: CaptainInteractionState; platformLabel: string }> = ({
+export const StatusBanner: React.FC<{
+  vessel: VesselContext;
+  interaction: CaptainInteractionState;
+  platformLabel: string;
+  compact?: boolean;
+}> = ({
   vessel,
   interaction,
   platformLabel,
+  compact,
 }) => {
   const tone = toneFor(vessel, interaction);
   const glow = useSharedValue(0.7);
@@ -37,10 +43,10 @@ export const StatusBanner: React.FC<{ vessel: VesselContext; interaction: Captai
 
   return (
     <GlassSurface tone="signal" signal={tone.color}>
-      <View style={styles.inner}>
+      <View style={[styles.inner, compact && styles.innerCompact]}>
         <Animated.View style={[styles.led, { backgroundColor: tone.color, shadowColor: tone.color }, ledStyle]} />
         <View style={styles.copy}>
-          <Text style={styles.label}>{tone.label}</Text>
+          <Text style={[styles.label, compact && styles.labelCompact]}>{tone.label}</Text>
           <Text style={styles.detail}>{tone.detail}</Text>
           <Text style={styles.detail}>
             {vessel.platformConnection === 'CONNECTED'
@@ -60,6 +66,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
+  innerCompact: {
+    padding: 12,
+    alignItems: 'flex-start',
+  },
   led: {
     width: 14,
     height: 14,
@@ -70,17 +80,26 @@ const styles = StyleSheet.create({
   },
   copy: {
     flex: 1,
+    minWidth: 0,
   },
   label: {
     color: Color.text,
     fontFamily: Type.display,
     fontSize: 24,
     letterSpacing: 1,
+    flexShrink: 1,
+  },
+  labelCompact: {
+    fontSize: 16,
+    lineHeight: 18,
+    letterSpacing: 0.6,
   },
   detail: {
     color: Color.textSecondary,
     fontFamily: Type.body,
     fontSize: 12,
+    lineHeight: 16,
     marginTop: 1,
+    flexShrink: 1,
   },
 });

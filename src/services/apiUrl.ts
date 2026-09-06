@@ -25,8 +25,18 @@ const deployedOrigin = (): string | null => {
   return null;
 };
 
+const publicUrl = (value?: string): string | null => {
+  if (!value) {
+    return null;
+  }
+  if (/localhost|127\.0\.0\.1/i.test(value)) {
+    return null;
+  }
+  return value.replace(/\/$/, '');
+};
+
 export const getPlatformUrl = (): string =>
-  (process.env.EXPO_PUBLIC_PLATFORM_URL || deployedOrigin() || fromHost(4000)).replace(/\/$/, '');
+  (publicUrl(process.env.EXPO_PUBLIC_PLATFORM_URL) || deployedOrigin() || fromHost(4000)).replace(/\/$/, '');
 
 export const getAgentUrl = (): string =>
-  (process.env.EXPO_PUBLIC_AGENT_URL || deployedOrigin() || fromHost(4001)).replace(/\/$/, '');
+  (publicUrl(process.env.EXPO_PUBLIC_AGENT_URL) || deployedOrigin() || fromHost(4001)).replace(/\/$/, '');

@@ -1,0 +1,6 @@
+.env
+.env.server
+.env*.local
+node_modules
+.expo
+web-build

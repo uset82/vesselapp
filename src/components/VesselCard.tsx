@@ -6,17 +6,17 @@ import { VesselContext } from '../types/vessel';
 import { GlassSurface } from './GlassSurface';
 import { VesselMark } from './icons/VesselMark';
 
-export const VesselCard: React.FC<{ vessel: VesselContext }> = ({ vessel }) => {
+export const VesselCard: React.FC<{ vessel: VesselContext; compact?: boolean }> = ({ vessel, compact }) => {
   return (
     <GlassSurface>
-      <View style={styles.inner} accessibilityRole="summary" accessibilityLabel={`${vessel.vesselName}, ${vessel.vesselType}`}>
+      <View style={[styles.inner, compact && styles.innerCompact]} accessibilityRole="summary" accessibilityLabel={`${vessel.vesselName}, ${vessel.vesselType}`}>
         <View style={styles.copy}>
           <Text style={styles.kicker}>VESSEL</Text>
-          <Text style={styles.name}>{vessel.vesselName.toUpperCase()}</Text>
+          <Text style={[styles.name, compact && styles.nameCompact]}>{vessel.vesselName.toUpperCase()}</Text>
           <Text style={styles.type}>{vessel.vesselType}</Text>
         </View>
-        <LinearGradient colors={['rgba(40, 56, 70, 0.7)', 'rgba(10, 14, 20, 0.9)']} style={styles.photo}>
-          <VesselMark size={54} framed={false} />
+        <LinearGradient colors={['rgba(40, 56, 70, 0.7)', 'rgba(10, 14, 20, 0.9)']} style={[styles.photo, compact && styles.photoCompact]}>
+          <VesselMark size={compact ? 40 : 54} framed={false} />
         </LinearGradient>
       </View>
     </GlassSurface>
@@ -30,8 +30,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
+  innerCompact: {
+    padding: 12,
+  },
   copy: {
     flex: 1,
+    minWidth: 0,
+  },
+  nameCompact: {
+    fontSize: 22,
+  },
+  photoCompact: {
+    width: 68,
+    height: 48,
   },
   kicker: {
     color: Color.textMuted,

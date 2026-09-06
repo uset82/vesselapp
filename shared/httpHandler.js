@@ -74,7 +74,25 @@ const forwardToPlatform = async (pathname, payload) => {
   }
 };
 
-const handleVesselApi = async (req, res) => {
+const normalizeApiPath = (req, forcedPath) => {
+  if (forcedPath) {
+    return String(forcedPath).replace(/\/+$/, '') || '/';
+  }
+  const host = req.headers.host || 'localhost';
+  let pathname = '/';
+  try {
+    pathname = new URL(req.url, `http://${host}`).pathname;
+  } catch {
+    pathname = String(req.url || '/').split('?')[0];
+  }
+  const clean = pathname.replace(/\/+$/, '') || '/';
+  if (clean.startsWith('/api/') || clean === '/api') {
+    return clean;
+  }
+  return `/api${clean.startsWith('/') ? clean : `/${clean}`}`;
+};
+
+const handleVesselApi = async (req, res, forcedPath) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Request-Id');
@@ -85,8 +103,7 @@ const handleVesselApi = async (req, res) => {
     return true;
   }
 
-  const host = req.headers.host || 'localhost';
-  const pathname = new URL(req.url, `http://${host}`).pathname;
+  const pathname = normalizeApiPath(req, forcedPath);
 
   if (req.method === 'GET' && pathname === '/api/health') {
     const models = await describeModels();
@@ -222,7 +239,15 @@ const handleVesselApi = async (req, res) => {
   return false;
 };
 
+const invokeVesselApi = async (req, res, forcedPath) => {
+  const handled = await handleVesselApi(req, res, forcedPath);
+  if (!handled) {
+    sendJson(res, 404, { error: 'Endpoint not found' });
+  }
+};
+
 module.exports = {
   handleVesselApi,
+  invokeVesselApi,
   sendJson,
 };

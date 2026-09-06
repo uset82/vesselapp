@@ -10,7 +10,7 @@ import {
 } from '../services/platformClient';
 import { requestSpeechPermissions, SpeechPermissionState } from '../services/speechPermissions';
 import { cancelListening, startListening, stopListening } from '../services/speechToText';
-import { speakText, stopSpeech } from '../services/textToSpeech';
+import { speakText, stopSpeech, unlockWebPlayback } from '../services/textToSpeech';
 import { pulseLight, pulseSuccess, pulseWarn } from '../services/haptics';
 import { ConversationTurn, PendingInterpretation, VesselAgentResponse } from '../types/agent';
 import { VesselEventType } from '../types/events';
@@ -170,6 +170,12 @@ export const VesselProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       listeningRef.current = false;
       const result = await stopListening();
       setPartialTranscript('');
+      if (!result.text.trim()) {
+        setTypedOpen(true);
+        setLastError('I did not hear a report. Tap the microphone again or type instead.');
+        setInteraction('IDLE');
+        return;
+      }
       await interpret(result.text, result.provider === 'apple-speech' ? 'apple-speech' : 'typed');
       return;
     }
@@ -178,6 +184,7 @@ export const VesselProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       return;
     }
 
+    await unlockWebPlayback();
     await stopSpeech();
     const permission = await requestSpeechPermissions();
     setSpeechPermission(permission);
