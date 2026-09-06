@@ -15,8 +15,18 @@ const fromHost = (port: number): string => {
   return `http://localhost:${port}`;
 };
 
+const deployedOrigin = (): string | null => {
+  if (Platform.OS === 'web' && typeof window !== 'undefined') {
+    const { hostname, origin } = window.location;
+    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+      return origin;
+    }
+  }
+  return null;
+};
+
 export const getPlatformUrl = (): string =>
-  (process.env.EXPO_PUBLIC_PLATFORM_URL || fromHost(4000)).replace(/\/$/, '');
+  (process.env.EXPO_PUBLIC_PLATFORM_URL || deployedOrigin() || fromHost(4000)).replace(/\/$/, '');
 
 export const getAgentUrl = (): string =>
-  (process.env.EXPO_PUBLIC_AGENT_URL || fromHost(4001)).replace(/\/$/, '');
+  (process.env.EXPO_PUBLIC_AGENT_URL || deployedOrigin() || fromHost(4001)).replace(/\/$/, '');
