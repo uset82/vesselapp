@@ -6,6 +6,7 @@ export type VesselIntent =
   | 'PROPULSION_FAILURE'
   | 'RECOVERY'
   | 'MANEUVERABILITY_RESTORED'
+  | 'FIRE_ONBOARD'
   | 'EMERGENCY'
   | 'UNKNOWN'
   | 'CLARIFY';

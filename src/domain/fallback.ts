@@ -51,6 +51,24 @@ const SINKING = [
 
 const SINKING_STT = ['we are thinking', "we're thinking", 'we re thinking', 'were thinking', 'we thinking'];
 
+const FIRE = [
+  'we have a fire',
+  "we've got a fire",
+  'fire in the engine room',
+  'engine room fire',
+  'fire onboard',
+  'fire on board',
+  'smoke on deck',
+  'smoke in the engine room',
+  'det brenner',
+  'brann i maskinrommet',
+  'brann ombord',
+  'we are on fire',
+  "we're on fire",
+  'ship is on fire',
+  'vessel is on fire',
+];
+
 const RESTORED = [
   'full maneuverability',
   'full manoeuvrability',
@@ -138,6 +156,17 @@ export const interpretLocally = (
       proposedEvent: null,
       requiresConfirmation: false,
       clarification: 'CLARIFY_SINKING',
+      usedFallback: true,
+      speak: true,
+    };
+  }
+  if (includesAny(haystack, FIRE)) {
+    return {
+      message: 'I understood: fire onboard. Report this emergency to SOGN SAFE?',
+      intent: 'FIRE_ONBOARD',
+      confidence: 0.95,
+      proposedEvent: { type: 'VESSEL_EMERGENCY_TRIGGERED', incidentType: 'FIRE_ONBOARD' },
+      requiresConfirmation: true,
       usedFallback: true,
       speak: true,
     };

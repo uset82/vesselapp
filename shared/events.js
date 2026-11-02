@@ -27,6 +27,8 @@ const INCIDENT_TYPES = [
   'PROPULSION_RECOVERING',
   'MANEUVERABILITY_RESTORED',
   'FLOODING',
+  'FIRE_ONBOARD',
+  'FIRE_UNDER_CONTROL',
   'STATUS_UPDATE',
   'GENERAL',
 ];
@@ -71,7 +73,8 @@ const validateVesselEvent = (payload) => {
     if (
       inner.incidentType !== 'MANEUVERABILITY_LOST' &&
       inner.incidentType !== 'PROPULSION_FAILURE' &&
-      inner.incidentType !== 'FLOODING'
+      inner.incidentType !== 'FLOODING' &&
+      inner.incidentType !== 'FIRE_ONBOARD'
     ) {
       return { ok: false, error: 'Emergency incidentType is not allowed.' };
     }
@@ -116,14 +119,14 @@ const emergencyFixtures = {
       speedKnots: 8.4,
       headingDegrees: 127,
       position: { latitude: 60.8631, longitude: 7.1134 },
-      scenarioId: 'FLAM_VESSEL_01',
+      scenarioId: 'FJORDVIK_VESSEL_01',
     },
   },
   maneuverabilityRestored: {
     id: 'evt_fixture_restore_01',
     type: 'VESSEL_MANEUVERABILITY_RESTORED',
     vesselId: 'MS_FJORD_STAR',
-    incidentId: 'inc-flam-2026-09',
+    incidentId: 'inc-fjordvik-2026-11',
     timestamp: '2026-09-06T12:48:00.000Z',
     source: 'VESSEL_APP',
     trainingMode: true,

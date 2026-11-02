@@ -14,6 +14,8 @@ export type VesselPropulsionStatus =
   | 'RESTORED'
   | 'UNKNOWN';
 
+export type VesselFireStatus = 'NONE' | 'ACTIVE' | 'CONTAINED' | 'UNKNOWN';
+
 export type ConnectionStatus = 'CONNECTED' | 'CONNECTING' | 'DISCONNECTED' | 'RECONNECTING';
 
 export type CaptainInteractionState =
@@ -41,6 +43,7 @@ export interface VesselContext {
   headingDegrees: number;
   maneuverabilityStatus: VesselManeuverabilityStatus;
   propulsionStatus: VesselPropulsionStatus;
+  fireStatus: VesselFireStatus;
   platformConnection: ConnectionStatus;
   activeIncidentId?: string | null;
   trainingMode: boolean;

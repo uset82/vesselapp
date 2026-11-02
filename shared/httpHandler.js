@@ -198,15 +198,21 @@ const handleVesselApi = async (req, res, forcedPath) => {
     const incidentId =
       forwarded.data?.incidentId ||
       forwarded.data?.incident?.id ||
-      (event.type === 'VESSEL_EMERGENCY_TRIGGERED' ? `inc-flam-${Date.now()}` : state.vessel.activeIncidentId);
+      (event.type === 'VESSEL_EMERGENCY_TRIGGERED' ? `inc-fjordvik-${Date.now()}` : state.vessel.activeIncidentId);
 
     if (event.type === 'VESSEL_EMERGENCY_TRIGGERED') {
       state.lastEmergencyId = event.id;
       state.vessel.activeIncidentId = incidentId;
       state.vessel.maneuverabilityStatus = 'LOST';
+      if (event.payload?.incidentType === 'FIRE_ONBOARD') {
+        state.vessel.fireStatus = 'ACTIVE';
+      }
     }
     if (event.type === 'VESSEL_RECOVERY_REPORTED') {
       state.vessel.propulsionStatus = 'RECOVERING';
+      if (event.payload?.incidentType === 'FIRE_UNDER_CONTROL') {
+        state.vessel.fireStatus = 'CONTAINED';
+      }
     }
     if (event.type === 'VESSEL_MANEUVERABILITY_RESTORED') {
       state.vessel.maneuverabilityStatus = 'RESTORED';

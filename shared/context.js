@@ -8,7 +8,7 @@ const buildVesselAgentContext = (vessel, extras = {}) => {
     vesselId: base.vesselId,
     vesselName: base.vesselName,
     vesselType: base.vesselType,
-    scenarioId: base.scenarioId || 'FLAM_VESSEL_01',
+    scenarioId: base.scenarioId || 'FJORDVIK_VESSEL_01',
     position: {
       latitude: position.latitude,
       longitude: position.longitude,
@@ -17,6 +17,7 @@ const buildVesselAgentContext = (vessel, extras = {}) => {
     headingDegrees: base.headingDegrees,
     maneuverabilityStatus: base.maneuverabilityStatus,
     propulsionStatus: base.propulsionStatus,
+    fireStatus: base.fireStatus || 'NONE',
     platformConnection: base.platformConnection,
     activeIncidentId: base.activeIncidentId || null,
     trainingMode: base.trainingMode !== false,

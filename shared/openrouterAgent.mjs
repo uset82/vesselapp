@@ -113,7 +113,7 @@ export const askVesselAgent = async ({ message, context, conversation, pendingCl
   const phraseTool = tool({
     name: 'match_training_phrases',
     description:
-      'Deterministic classroom matcher for known Flåm captain phrases such as lost maneuverability, cannot steer, engines responding, or full control again.',
+      'Deterministic classroom matcher for known captain phrases such as lost maneuverability, cannot steer, fire onboard, engines responding, or full control again.',
     inputSchema: z.object({
       report: z.string().describe('The captain report to match'),
     }),

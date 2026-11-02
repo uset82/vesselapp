@@ -4,7 +4,7 @@ export const DEMO_VESSEL: VesselContext = {
   vesselId: 'MS_FJORD_STAR',
   vesselName: 'MS Fjord Star',
   vesselType: 'Passenger Vessel',
-  scenarioId: 'FLAM_VESSEL_01',
+  scenarioId: 'FJORDVIK_VESSEL_01',
   position: {
     latitude: 60.8631,
     longitude: 7.1134,
@@ -13,6 +13,7 @@ export const DEMO_VESSEL: VesselContext = {
   headingDegrees: 127,
   maneuverabilityStatus: 'NORMAL',
   propulsionStatus: 'NORMAL',
+  fireStatus: 'NONE',
   platformConnection: 'CONNECTING',
   activeIncidentId: null,
   trainingMode: true,
@@ -28,5 +29,6 @@ export const createDemoVessel = (): VesselContext => ({
   activeIncidentId: null,
   maneuverabilityStatus: 'NORMAL',
   propulsionStatus: 'NORMAL',
+  fireStatus: 'NONE',
   updatedAt: new Date().toISOString(),
 });

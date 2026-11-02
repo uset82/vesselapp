@@ -89,6 +89,24 @@ const SINKING_STT_PHRASES = [
   'we thinking',
 ];
 
+const FIRE_PHRASES = [
+  'we have a fire',
+  "we've got a fire",
+  'fire in the engine room',
+  'engine room fire',
+  'fire onboard',
+  'fire on board',
+  'smoke on deck',
+  'smoke in the engine room',
+  'det brenner',
+  'brann i maskinrommet',
+  'brann ombord',
+  'we are on fire',
+  "we're on fire",
+  'ship is on fire',
+  'vessel is on fire',
+];
+
 const AMBIGUOUS_PHRASES = [
   'engine problems',
   'engine problem',
@@ -147,6 +165,9 @@ const classifyCaptainText = (text, pendingIntent) => {
   if (includesAny(haystack, RECOVERY_PHRASES)) {
     return 'RECOVERY';
   }
+  if (includesAny(haystack, FIRE_PHRASES)) {
+    return 'FIRE_ONBOARD';
+  }
   if (includesAny(haystack, AMBIGUOUS_PHRASES)) {
     return 'AMBIGUOUS_ENGINE';
   }
@@ -179,6 +200,21 @@ const interpretWithFallback = (text, pendingIntent) => {
       proposedEvent: null,
       requiresConfirmation: false,
       clarification: 'CLARIFY_SINKING',
+      usedFallback: true,
+      speak: true,
+    });
+  }
+
+  if (classified === 'FIRE_ONBOARD') {
+    return validateAgentResponse({
+      message: 'I understood: fire onboard. Report this emergency to SOGN SAFE?',
+      intent: 'FIRE_ONBOARD',
+      confidence: 0.95,
+      proposedEvent: {
+        type: 'VESSEL_EMERGENCY_TRIGGERED',
+        incidentType: 'FIRE_ONBOARD',
+      },
+      requiresConfirmation: true,
       usedFallback: true,
       speak: true,
     });
@@ -274,6 +310,7 @@ module.exports = {
   interpretWithFallback,
   EMERGENCY_PHRASES,
   SINKING_PHRASES,
+  FIRE_PHRASES,
   RESTORED_PHRASES,
   RECOVERY_PHRASES,
 };
