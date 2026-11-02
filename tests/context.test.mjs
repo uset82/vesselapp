@@ -15,6 +15,7 @@ assert.equal(context.vesselName, 'MS Fjord Star');
 assert.equal(context.trainingMode, true);
 assert.equal(context.maneuverabilityStatus, 'NORMAL');
 assert.equal(context.propulsionStatus, 'NORMAL');
+assert.equal(context.fireStatus, 'NONE');
 assert.equal(context.platformConnection, 'CONNECTED');
 assert.equal(context.activeIncidentId, null);
 assert.equal(context.speedKnots, 8.4);
@@ -23,4 +24,4 @@ assert.ok(context.position.latitude > 60);
 assert.ok(context.position.longitude > 7);
 assert.deepEqual(context.latestConfirmedReports, ['Vessel connected']);
 
-console.log('context: 11/11 passed');
+console.log('context: 12/12 passed');

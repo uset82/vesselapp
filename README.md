@@ -20,7 +20,7 @@ For web verification:
 npm run web
 ```
 
-The existing classroom Platform / simulator should be running on port 4000 (`../app` → `npm start`). Confirmed emergencies are sent to `POST /api/vessel/events` and activate the Flåm scenario used by the Platform and Civilian App.
+The existing classroom Platform / simulator should be running on port 4000 (`../app` → `npm start`). Confirmed emergencies are sent to `POST /api/vessel/events` and activate the Fjordvik scenario used by the Platform and Civilian App.
 
 ## Environment
 

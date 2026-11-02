@@ -7,8 +7,17 @@ import { GlassSurface } from './GlassSurface';
 export const ReportedModal: React.FC<{
   visible: boolean;
   ack: PlatformAcknowledgement | null;
+  reportedIncidentType: string | null;
   onContinue: () => void;
-}> = ({ visible, ack, onContinue }) => {
+}> = ({ visible, ack, reportedIncidentType, onContinue }) => {
+  const incidentLabel =
+    reportedIncidentType === 'FIRE_ONBOARD'
+      ? 'Fire onboard'
+      : reportedIncidentType === 'FLOODING'
+        ? 'Flooding'
+        : reportedIncidentType === 'PROPULSION_FAILURE'
+          ? 'Propulsion failure'
+          : 'Maneuverability lost';
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onContinue}>
       <View style={styles.back}>
@@ -17,7 +26,7 @@ export const ReportedModal: React.FC<{
           <Text style={styles.kicker}>EMERGENCY REPORTED</Text>
           <Text style={styles.time}>{new Date().toLocaleTimeString()}</Text>
           <Text style={styles.lead}>SOGN SAFE Platform received:</Text>
-          {['Maneuverability lost', 'Vessel position', 'Vessel identity', 'Current heading', 'Current speed'].map((item) => (
+          {[incidentLabel, 'Vessel position', 'Vessel identity', 'Current heading', 'Current speed'].map((item) => (
             <Text key={item} style={styles.item}>
               ✓  {item}
             </Text>

@@ -35,6 +35,7 @@ interface VesselStore {
   platformStatusLabel: string;
   showDemo: boolean;
   lastReportIsEmergency: boolean;
+  lastReportedIncidentType: string | null;
   handleToggleType: () => void;
   handleSendText: (text: string) => Promise<void>;
   handleMicPress: () => Promise<void>;
@@ -44,6 +45,8 @@ interface VesselStore {
   handleContinueTalking: () => void;
   handleManualEmergency: () => void;
   handleDemoLost: () => void;
+  handleDemoFire: () => void;
+  handleDemoFireContained: () => void;
   handleDemoRestore: () => void;
   handleReset: () => Promise<void>;
   handleRequestSpeech: () => Promise<void>;
@@ -95,6 +98,7 @@ export const VesselProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [platformStatusLabel, setPlatformStatusLabel] = useState('Connecting');
   const [showDemo, setShowDemo] = useState(false);
   const [lastReportIsEmergency, setLastReportIsEmergency] = useState(false);
+  const [lastReportedIncidentType, setLastReportedIncidentType] = useState<string | null>(null);
   const lastEmergencyId = useRef<string | null>(null);
   const pendingClarification = useRef<string | null>(null);
   const listeningRef = useRef(false);
@@ -245,7 +249,8 @@ export const VesselProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           ? createEmergencyEvent(
               vessel,
               response.proposedEvent.incidentType === 'PROPULSION_FAILURE' ||
-                response.proposedEvent.incidentType === 'FLOODING'
+                response.proposedEvent.incidentType === 'FLOODING' ||
+                response.proposedEvent.incidentType === 'FIRE_ONBOARD'
                 ? response.proposedEvent.incidentType
                 : 'MANEUVERABILITY_LOST'
             )
@@ -284,10 +289,19 @@ export const VesselProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               : current.maneuverabilityStatus,
         propulsionStatus:
           response.proposedEvent?.type === 'VESSEL_RECOVERY_REPORTED' ? 'RECOVERING' : current.propulsionStatus,
+        fireStatus:
+          response.proposedEvent?.type === 'VESSEL_EMERGENCY_TRIGGERED' &&
+          response.proposedEvent.incidentType === 'FIRE_ONBOARD'
+            ? 'ACTIVE'
+            : response.proposedEvent?.type === 'VESSEL_RECOVERY_REPORTED' &&
+                response.proposedEvent.incidentType === 'FIRE_UNDER_CONTROL'
+              ? 'CONTAINED'
+              : current.fireStatus,
         updatedAt: new Date().toISOString(),
       }));
       setPlatformStatusLabel(ack.platformStatus || 'ACTIVE');
       pushHistory('platform', `Platform: ${ack.platformStatus || 'received'} (${ack.eventId})`);
+      setLastReportedIncidentType(response.proposedEvent.incidentType || null);
       setPending(null);
       setInteraction('REPORTED');
       pulseSuccess();
@@ -332,6 +346,36 @@ export const VesselProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setShowDemo(false);
   }, [handleManualEmergency]);
 
+  const handleDemoFire = useCallback(() => {
+    const response: VesselAgentResponse = {
+      message: 'Training backup: fire onboard. Report this emergency to SOGN SAFE?',
+      intent: 'FIRE_ONBOARD',
+      confidence: 1,
+      proposedEvent: { type: 'VESSEL_EMERGENCY_TRIGGERED', incidentType: 'FIRE_ONBOARD' },
+      requiresConfirmation: true,
+      usedFallback: true,
+      speak: false,
+    };
+    setPending({ response, captainText: 'Manual fire trigger' });
+    setInteraction('CONFIRMATION_REQUIRED');
+    setShowDemo(false);
+  }, []);
+
+  const handleDemoFireContained = useCallback(() => {
+    const response: VesselAgentResponse = {
+      message: 'I understood: fire under control. Send this update?',
+      intent: 'RECOVERY',
+      confidence: 1,
+      proposedEvent: { type: 'VESSEL_RECOVERY_REPORTED', incidentType: 'FIRE_UNDER_CONTROL' },
+      requiresConfirmation: true,
+      usedFallback: true,
+      speak: false,
+    };
+    setPending({ response, captainText: 'Demo fire contained' });
+    setInteraction('CONFIRMATION_REQUIRED');
+    setShowDemo(false);
+  }, []);
+
   const handleDemoRestore = useCallback(() => {
     const response: VesselAgentResponse = {
       message: 'I understood: maneuverability restored. Send this update?',
@@ -368,6 +412,7 @@ export const VesselProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setPlatformStatusLabel('Connected');
     setShowDemo(false);
     setLastReportIsEmergency(false);
+    setLastReportedIncidentType(null);
     void connectToPlatform(next.vesselId);
   }, [vessel.vesselId]);
 
@@ -438,6 +483,7 @@ export const VesselProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       platformStatusLabel,
       showDemo,
       lastReportIsEmergency,
+      lastReportedIncidentType,
       handleToggleType: () => setTypedOpen((open) => !open),
       handleSendText,
       handleMicPress,
@@ -447,6 +493,8 @@ export const VesselProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       handleContinueTalking,
       handleManualEmergency,
       handleDemoLost,
+      handleDemoFire,
+      handleDemoFireContained,
       handleDemoRestore,
       handleReset,
       handleRequestSpeech,
@@ -463,6 +511,8 @@ export const VesselProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       handleConfirm,
       handleContinueTalking,
       handleDemoLost,
+      handleDemoFire,
+      handleDemoFireContained,
       handleDemoRestore,
       handleManualEmergency,
       handleMicPress,
@@ -478,6 +528,7 @@ export const VesselProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       platformStatusLabel,
       showDemo,
       lastReportIsEmergency,
+      lastReportedIncidentType,
       speechPermission,
       submitting,
       ttsEnabled,

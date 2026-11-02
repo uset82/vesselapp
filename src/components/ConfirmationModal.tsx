@@ -23,7 +23,12 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   onCancel,
 }) => {
   const rawType = pending?.response.proposedEvent?.incidentType || 'UNKNOWN';
-  const eventType = rawType === 'FLOODING' ? 'SINKING / FLOODING' : rawType.replace(/_/g, ' ');
+  const labelMap: Record<string, string> = {
+    FLOODING: 'SINKING / FLOODING',
+    FIRE_ONBOARD: 'FIRE ONBOARD',
+    FIRE_UNDER_CONTROL: 'FIRE UNDER CONTROL',
+  };
+  const eventType = labelMap[rawType] || rawType.replace(/_/g, ' ');
   const isEmergency = pending?.response.proposedEvent?.type === 'VESSEL_EMERGENCY_TRIGGERED';
 
   return (

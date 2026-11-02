@@ -494,7 +494,7 @@ Type:
 Passenger vessel
 
 Scenario:
-FLAM_VESSEL_01
+FJORDVIK_VESSEL_01
 
 Status:
 NORMAL
@@ -505,7 +505,7 @@ TRUE
 Demo telemetry:
 
 Position:
-near Flåm harbor
+near Fjordvik harbor
 
 Speed:
 8.4 kn
@@ -1660,7 +1660,7 @@ Civilian iPhone:
 🚨 EMERGENCY ALERT
 
 Possible vessel collision
-near Flåm harbor.
+near Fjordvik harbor.
 
 GO TO SAFETY
 
@@ -1736,7 +1736,7 @@ SOGN SAFE Vessel is complete for the INN524 prototype when:
 
 Captain can communicate primarily by voice.
 Captain can always fall back to text.
-Vessel Agent understands the Flåm maneuverability-loss scenario.
+Vessel Agent understands the Fjordvik maneuverability-loss scenario.
 Vessel Agent asks for clarification when needed.
 Vessel Agent converts conversation into structured events.
 Captain must confirm critical events.

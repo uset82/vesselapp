@@ -9,6 +9,12 @@ const toneFor = (vessel: VesselContext, interaction: CaptainInteractionState) =>
   if (vessel.platformConnection === 'DISCONNECTED') {
     return { label: 'PLATFORM CONNECTION LOST', detail: 'Do not assume any report was delivered.', color: Color.amber };
   }
+  if (vessel.fireStatus === 'ACTIVE') {
+    return { label: 'FIRE ONBOARD — REPORTED', detail: 'Platform coordination is the source of truth.', color: Color.red };
+  }
+  if (vessel.fireStatus === 'CONTAINED') {
+    return { label: 'FIRE CONTAINED', detail: 'Recovery update is with the Platform.', color: Color.amber };
+  }
   if (vessel.maneuverabilityStatus === 'LOST' || interaction === 'REPORTED' || interaction === 'REPORTING') {
     return { label: 'EMERGENCY REPORTED', detail: 'Platform coordination is the source of truth.', color: Color.red };
   }

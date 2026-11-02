@@ -7,9 +7,11 @@ export const DemoPanel: React.FC<{
   visible: boolean;
   onClose: () => void;
   onLost: () => void;
+  onFire: () => void;
+  onFireContained: () => void;
   onRestore: () => void;
   onReset: () => void;
-}> = ({ visible, onClose, onLost, onRestore, onReset }) => {
+}> = ({ visible, onClose, onLost, onFire, onFireContained, onRestore, onReset }) => {
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.back}>
@@ -17,6 +19,12 @@ export const DemoPanel: React.FC<{
         <View style={styles.sheetInner}>
           <Text style={styles.kicker}>DEMO CONTROLS</Text>
           <Text style={styles.note}>Training simulation only. These buttons reuse the real event pipeline.</Text>
+          <Pressable onPress={onFire} style={styles.danger} accessibilityRole="button" accessibilityLabel="Trigger fire onboard">
+            <Text style={styles.dangerText}>TRIGGER FIRE ONBOARD</Text>
+          </Pressable>
+          <Pressable onPress={onFireContained} style={styles.btn} accessibilityRole="button" accessibilityLabel="Report fire under control">
+            <Text style={styles.btnText}>REPORT FIRE UNDER CONTROL</Text>
+          </Pressable>
           <Pressable onPress={onLost} style={styles.danger} accessibilityRole="button" accessibilityLabel="Trigger maneuverability lost">
             <Text style={styles.dangerText}>TRIGGER MANEUVERABILITY LOST</Text>
           </Pressable>

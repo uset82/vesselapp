@@ -104,12 +104,15 @@ export default function HomeScreen() {
           Boolean(store.acknowledgement?.acknowledged)
         }
         ack={store.acknowledgement}
+        reportedIncidentType={store.lastReportedIncidentType}
         onContinue={store.handleContinueTalking}
       />
       <DemoPanel
         visible={store.showDemo}
         onClose={store.handleToggleDemo}
         onLost={store.handleDemoLost}
+        onFire={store.handleDemoFire}
+        onFireContained={store.handleDemoFireContained}
         onRestore={store.handleDemoRestore}
         onReset={store.handleReset}
       />

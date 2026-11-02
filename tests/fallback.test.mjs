@@ -17,6 +17,10 @@ const cases = [
   ['We are sinking.', 'SINKING'],
   ['The ship is taking on water.', 'SINKING'],
   ["Bro we're thinking we're thinking", 'CLARIFY_SINKING'],
+  ['We have a fire in the engine room.', 'FIRE_ONBOARD'],
+  ['Fire onboard.', 'FIRE_ONBOARD'],
+  ['Det brenner.', 'FIRE_ONBOARD'],
+  ['Brann i maskinrommet.', 'FIRE_ONBOARD'],
 ];
 
 for (const [message, intent] of cases) {
@@ -58,4 +62,14 @@ const afterSinkingYes = interpretWithFallback('Yes', 'CLARIFY_SINKING');
 assert.equal(afterSinkingYes.intent, 'EMERGENCY');
 assert.equal(afterSinkingYes.proposedEvent.type, 'VESSEL_EMERGENCY_TRIGGERED');
 
-console.log('fallback: 20/20 passed');
+const fire = interpretWithFallback('We have a fire in the engine room.');
+assert.equal(fire.intent, 'FIRE_ONBOARD');
+assert.equal(fire.proposedEvent.type, 'VESSEL_EMERGENCY_TRIGGERED');
+assert.equal(fire.proposedEvent.incidentType, 'FIRE_ONBOARD');
+assert.equal(fire.requiresConfirmation, true);
+
+const fireNo = interpretWithFallback('engine room fire');
+assert.equal(fireNo.intent, 'FIRE_ONBOARD');
+assert.equal(fireNo.proposedEvent.incidentType, 'FIRE_ONBOARD');
+
+console.log('fallback: 24/24 passed');

@@ -25,6 +25,13 @@ const Tile: React.FC<{ label: string; value: string; icon: React.ReactNode; ok?:
 
 export const TelemetryGrid: React.FC<{ vessel: VesselContext; clock: string }> = ({ vessel, clock }) => {
   const connected = vessel.platformConnection === 'CONNECTED';
+  const fireOk = vessel.fireStatus === 'NONE' || vessel.fireStatus === 'CONTAINED';
+  const fireLabel =
+    vessel.fireStatus === 'ACTIVE'
+      ? 'Active'
+      : vessel.fireStatus === 'CONTAINED'
+        ? 'Contained'
+        : 'None';
   return (
     <View style={styles.grid}>
       <Tile label="POSITION" value="Shared" ok icon={<PinIcon />} />
@@ -36,6 +43,7 @@ export const TelemetryGrid: React.FC<{ vessel: VesselContext; clock: string }> =
       />
       <Tile label="SPEED" value={`${vessel.speedKnots.toFixed(1)} kn`} icon={<SpeedIcon />} />
       <Tile label="HEADING" value={`${vessel.headingDegrees}°`} icon={<CompassIcon />} />
+      <Tile label="FIRE" value={fireLabel} ok={fireOk} />
       <Tile label="LAST UPDATE" value={clock} icon={<ClockIcon />} />
     </View>
   );

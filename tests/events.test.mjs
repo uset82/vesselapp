@@ -38,4 +38,13 @@ const built = createVesselEvent({
 assert.equal(built.source, 'VESSEL_APP');
 assert.equal(validateVesselEvent(built).ok, true);
 
-console.log('events: 6/6 passed');
+const fireEvent = validateVesselEvent({
+  ...emergencyFixtures.maneuverabilityLost,
+  payload: {
+    ...emergencyFixtures.maneuverabilityLost.payload,
+    incidentType: 'FIRE_ONBOARD',
+  },
+});
+assert.equal(fireEvent.ok, true, 'FIRE_ONBOARD should be a valid emergency incidentType');
+
+console.log('events: 7/7 passed');
