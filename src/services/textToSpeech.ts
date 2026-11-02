@@ -108,30 +108,28 @@ export const speakText = async (text: string, language: 'en' | 'no' = 'en'): Pro
   await stopSpeech();
 
   if (Platform.OS === 'web') {
-    const preferRemote = typeof window === 'undefined' || !window.speechSynthesis || isIosWeb();
-    if (preferRemote) {
-      const remote = await requestAgentSpeech(clean, language);
-      if (remote && (await playRemoteAudio(remote))) {
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.resume();
+      const spoken = await new Promise<boolean>((resolve) => {
+        const utter = new SpeechSynthesisUtterance(clean);
+        utter.lang = voiceLocale(language);
+        utter.rate = 0.96;
+        utter.onstart = () => resolve(true);
+        utter.onend = () => resolve(true);
+        utter.onerror = () => resolve(false);
+        window.speechSynthesis.speak(utter);
+        setTimeout(() => resolve(window.speechSynthesis.speaking || window.speechSynthesis.pending), 400);
+      });
+      if (spoken) {
         return;
       }
     }
 
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
-      window.speechSynthesis.resume();
-      await new Promise<void>((resolve) => {
-        const utter = new SpeechSynthesisUtterance(clean);
-        utter.lang = voiceLocale(language);
-        utter.rate = 0.96;
-        utter.onend = () => resolve();
-        utter.onerror = () => resolve();
-        window.speechSynthesis.speak(utter);
-      });
-      return;
-    }
-
-    const remote = await requestAgentSpeech(clean, language);
-    if (remote) {
-      await playRemoteAudio(remote);
+    if (!isIosWeb()) {
+      const remote = await requestAgentSpeech(clean, language);
+      if (remote) {
+        await playRemoteAudio(remote);
+      }
     }
     return;
   }

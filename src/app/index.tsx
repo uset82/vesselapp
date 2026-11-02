@@ -72,6 +72,7 @@ export default function HomeScreen() {
             <TypeComposer
               open={store.typedOpen}
               busy={store.interaction === 'UNDERSTANDING' || store.submitting}
+              draft={store.heardDraft}
               onToggle={store.handleToggleType}
               onSend={store.handleSendText}
             />

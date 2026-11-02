@@ -27,7 +27,7 @@ export interface VesselEvent<T extends object = Record<string, unknown>> {
 }
 
 export interface EmergencyPayload {
-  incidentType: 'MANEUVERABILITY_LOST' | 'PROPULSION_FAILURE';
+  incidentType: 'MANEUVERABILITY_LOST' | 'PROPULSION_FAILURE' | 'FLOODING';
   reportedBy: 'CAPTAIN';
   vesselName: string;
   speedKnots: number;

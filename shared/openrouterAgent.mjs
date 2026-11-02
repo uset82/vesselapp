@@ -120,18 +120,18 @@ export const askVesselAgent = async ({ message, context, conversation, pendingCl
     execute: async ({ report }) => interpretWithFallback(report, pendingClarification || null),
   });
 
-  const deadline = Date.now() + 10000;
+  const deadline = Date.now() + 2800;
   let lastError = null;
 
-  for (const [index, model] of models.entries()) {
+  for (const [index, model] of models.slice(0, 1).entries()) {
     const remaining = deadline - Date.now();
-    if (remaining < 1200) {
+    if (remaining < 800) {
       break;
     }
 
-    const attempts = index === 0 ? [true, false] : [false];
+    const attempts = [false];
     for (const useTools of attempts) {
-      const attemptMs = Math.min(4500, Math.max(1200, deadline - Date.now()));
+      const attemptMs = Math.min(2500, Math.max(800, deadline - Date.now()));
       try {
         const result = client.callModel({
           model,

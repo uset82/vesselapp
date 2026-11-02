@@ -20,9 +20,12 @@ export const createVesselEvent = <T extends object>(
   payload,
 });
 
-export const createEmergencyEvent = (vessel: VesselContext): VesselEvent<EmergencyPayload> =>
+export const createEmergencyEvent = (
+  vessel: VesselContext,
+  incidentType: EmergencyPayload['incidentType'] = 'MANEUVERABILITY_LOST'
+): VesselEvent<EmergencyPayload> =>
   createVesselEvent<EmergencyPayload>('VESSEL_EMERGENCY_TRIGGERED', vessel, {
-    incidentType: 'MANEUVERABILITY_LOST',
+    incidentType,
     reportedBy: 'CAPTAIN',
     vesselName: vessel.vesselName,
     speedKnots: vessel.speedKnots,

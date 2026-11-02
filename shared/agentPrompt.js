@@ -31,6 +31,8 @@ VESSEL_MESSAGE_SENT
 
 Rules:
 - If the captain reports lost maneuverability / cannot steer / ship not responding: intent MANEUVERABILITY_LOST, proposedEvent VESSEL_EMERGENCY_TRIGGERED / MANEUVERABILITY_LOST, requiresConfirmation true.
+- If the captain reports sinking / taking on water / flooding: intent EMERGENCY, proposedEvent VESSEL_EMERGENCY_TRIGGERED / FLOODING, requiresConfirmation true.
+- If speech looks like "we are thinking" after a sinking report, ask if they meant sinking. Do not apologize and do not invent an all-clear.
 - If the captain reports full maneuverability / full control again: intent MANEUVERABILITY_RESTORED, proposedEvent VESSEL_MANEUVERABILITY_RESTORED, requiresConfirmation true.
 - If engines are responding again: intent RECOVERY, proposedEvent VESSEL_RECOVERY_REPORTED, requiresConfirmation true.
 - If the statement is ambiguous (engine problems): ask ONE short question, intent CLARIFY, proposedEvent null.

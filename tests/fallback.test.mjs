@@ -14,6 +14,9 @@ const cases = [
   ['We have full maneuverability again.', 'MANEUVERABILITY_RESTORED'],
   ['We have full control again.', 'MANEUVERABILITY_RESTORED'],
   ['We have engine problems.', 'AMBIGUOUS_ENGINE'],
+  ['We are sinking.', 'SINKING'],
+  ['The ship is taking on water.', 'SINKING'],
+  ["Bro we're thinking we're thinking", 'CLARIFY_SINKING'],
 ];
 
 for (const [message, intent] of cases) {
@@ -42,4 +45,17 @@ const unknown = interpretWithFallback('What is the weather?');
 assert.equal(unknown.intent, 'UNKNOWN');
 assert.equal(unknown.requiresConfirmation, false);
 
-console.log('fallback: 14/14 passed');
+const sinking = interpretWithFallback('We are sinking.');
+assert.equal(sinking.intent, 'EMERGENCY');
+assert.equal(sinking.proposedEvent.incidentType, 'FLOODING');
+assert.equal(sinking.requiresConfirmation, true);
+
+const heardThinking = interpretWithFallback("we're thinking");
+assert.equal(heardThinking.intent, 'CLARIFY');
+assert.equal(heardThinking.clarification, 'CLARIFY_SINKING');
+
+const afterSinkingYes = interpretWithFallback('Yes', 'CLARIFY_SINKING');
+assert.equal(afterSinkingYes.intent, 'EMERGENCY');
+assert.equal(afterSinkingYes.proposedEvent.type, 'VESSEL_EMERGENCY_TRIGGERED');
+
+console.log('fallback: 20/20 passed');

@@ -38,7 +38,7 @@ export const validateAgentResponse = (payload: unknown): VesselAgentResponse | n
 
 const postAgent = async (baseUrl: string, body: unknown): Promise<VesselAgentResponse | null> => {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 10000);
+  const timer = setTimeout(() => controller.abort(), 3500);
   try {
     const response = await fetch(`${baseUrl}/api/agents/vessel`, {
       method: 'POST',
@@ -62,7 +62,7 @@ export const requestAgentSpeech = async (
   language: 'en' | 'no' = 'en'
 ): Promise<{ audioBase64: string; mimeType: string } | null> => {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 15000);
+  const timer = setTimeout(() => controller.abort(), 2500);
   try {
     const response = await fetch(`${getAgentUrl()}/api/audio/speech`, {
       method: 'POST',
@@ -104,14 +104,18 @@ export const requestVesselAgent = async (
     pendingClarification: pendingClarification || null,
   };
 
-  const remote =
-    (await postAgent(getAgentUrl(), payload)) || (await postAgent(getPlatformUrl(), payload));
+  const local = interpretLocally(message, pendingClarification);
+  if (local.intent !== 'UNKNOWN') {
+    return { response: local, agentUnavailable: false };
+  }
+
+  const remote = await postAgent(getAgentUrl(), payload);
   if (remote) {
     return { response: remote, agentUnavailable: false };
   }
 
   return {
-    response: interpretLocally(message, pendingClarification),
-    agentUnavailable: true,
+    response: local,
+    agentUnavailable: false,
   };
 };

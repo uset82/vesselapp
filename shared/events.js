@@ -26,6 +26,7 @@ const INCIDENT_TYPES = [
   'PROPULSION_FAILURE',
   'PROPULSION_RECOVERING',
   'MANEUVERABILITY_RESTORED',
+  'FLOODING',
   'STATUS_UPDATE',
   'GENERAL',
 ];
@@ -67,7 +68,11 @@ const validateVesselEvent = (payload) => {
 
   if (payload.type === 'VESSEL_EMERGENCY_TRIGGERED') {
     const inner = payload.payload;
-    if (inner.incidentType !== 'MANEUVERABILITY_LOST' && inner.incidentType !== 'PROPULSION_FAILURE') {
+    if (
+      inner.incidentType !== 'MANEUVERABILITY_LOST' &&
+      inner.incidentType !== 'PROPULSION_FAILURE' &&
+      inner.incidentType !== 'FLOODING'
+    ) {
       return { ok: false, error: 'Emergency incidentType is not allowed.' };
     }
     if (inner.reportedBy !== 'CAPTAIN') {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Color, Touch, Type } from '../theme/tokens';
 import { GlassSurface } from './GlassSurface';
@@ -7,12 +7,19 @@ import { KeyboardIcon } from './icons/BridgeIcons';
 interface TypeComposerProps {
   open: boolean;
   busy: boolean;
+  draft?: string;
   onToggle: () => void;
   onSend: (text: string) => void;
 }
 
-export const TypeComposer: React.FC<TypeComposerProps> = ({ open, busy, onToggle, onSend }) => {
+export const TypeComposer: React.FC<TypeComposerProps> = ({ open, busy, draft, onToggle, onSend }) => {
   const [text, setText] = useState('');
+
+  useEffect(() => {
+    if (draft) {
+      setText(draft);
+    }
+  }, [draft]);
 
   const handleSend = () => {
     const clean = text.trim();

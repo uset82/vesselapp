@@ -22,7 +22,8 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   onConfirm,
   onCancel,
 }) => {
-  const eventType = pending?.response.proposedEvent?.incidentType || 'UNKNOWN';
+  const rawType = pending?.response.proposedEvent?.incidentType || 'UNKNOWN';
+  const eventType = rawType === 'FLOODING' ? 'SINKING / FLOODING' : rawType.replace(/_/g, ' ');
   const isEmergency = pending?.response.proposedEvent?.type === 'VESSEL_EMERGENCY_TRIGGERED';
 
   return (
@@ -32,7 +33,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         <View accessibilityViewIsModal style={styles.sheetInner}>
           <Text style={styles.kicker}>{isEmergency ? 'POSSIBLE EMERGENCY' : 'CONFIRM UPDATE'}</Text>
           <Text style={styles.lead}>I understood:</Text>
-          <Text style={styles.event}>{eventType.replace(/_/g, ' ')}</Text>
+          <Text style={styles.event}>{eventType}</Text>
           <Text style={styles.message}>{pending?.response.message}</Text>
           <View style={styles.meta}>
             <Text style={styles.metaText}>Position  Shared</Text>

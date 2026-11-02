@@ -61,6 +61,34 @@ const RECOVERY_PHRASES = [
   'power is coming back',
 ];
 
+const SINKING_PHRASES = [
+  'we are sinking',
+  "we're sinking",
+  'we re sinking',
+  'vessel is sinking',
+  'ship is sinking',
+  'the ship is sinking',
+  'the vessel is sinking',
+  'taking on water',
+  'taking in water',
+  'we are flooding',
+  "we're flooding",
+  'flooding',
+  'going down',
+  'we are syncing',
+  "we're syncing",
+  'we are sinkin',
+  "we're sinkin",
+];
+
+const SINKING_STT_PHRASES = [
+  'we are thinking',
+  "we're thinking",
+  'we re thinking',
+  'were thinking',
+  'we thinking',
+];
+
 const AMBIGUOUS_PHRASES = [
   'engine problems',
   'engine problem',
@@ -95,6 +123,21 @@ const classifyCaptainText = (text, pendingIntent) => {
     }
   }
 
+  if (pendingIntent === 'CLARIFY_SINKING') {
+    if (includesAny(haystack, SINKING_PHRASES) || includesAny(haystack, ['yes', 'ja', 'correct', 'sinking'])) {
+      return 'SINKING';
+    }
+    if (includesAny(haystack, ['no', 'nei', 'not sinking'])) {
+      return 'UNKNOWN';
+    }
+  }
+
+  if (includesAny(haystack, SINKING_PHRASES)) {
+    return 'SINKING';
+  }
+  if (includesAny(haystack, SINKING_STT_PHRASES)) {
+    return 'CLARIFY_SINKING';
+  }
   if (includesAny(haystack, EMERGENCY_PHRASES)) {
     return 'MANEUVERABILITY_LOST';
   }
@@ -112,6 +155,34 @@ const classifyCaptainText = (text, pendingIntent) => {
 
 const interpretWithFallback = (text, pendingIntent) => {
   const classified = classifyCaptainText(text, pendingIntent);
+
+  if (classified === 'SINKING') {
+    return validateAgentResponse({
+      message: 'I understood: the vessel is sinking. Report this emergency to SOGN SAFE?',
+      intent: 'EMERGENCY',
+      confidence: 0.93,
+      proposedEvent: {
+        type: 'VESSEL_EMERGENCY_TRIGGERED',
+        incidentType: 'FLOODING',
+      },
+      requiresConfirmation: true,
+      usedFallback: true,
+      speak: true,
+    });
+  }
+
+  if (classified === 'CLARIFY_SINKING') {
+    return validateAgentResponse({
+      message: 'Did you report that the vessel is sinking? Say sinking, or type We are sinking.',
+      intent: 'CLARIFY',
+      confidence: 0.58,
+      proposedEvent: null,
+      requiresConfirmation: false,
+      clarification: 'CLARIFY_SINKING',
+      usedFallback: true,
+      speak: true,
+    });
+  }
 
   if (classified === 'MANEUVERABILITY_LOST') {
     return validateAgentResponse({
@@ -202,6 +273,7 @@ module.exports = {
   classifyCaptainText,
   interpretWithFallback,
   EMERGENCY_PHRASES,
+  SINKING_PHRASES,
   RESTORED_PHRASES,
   RECOVERY_PHRASES,
 };

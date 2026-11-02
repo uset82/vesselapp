@@ -2,6 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useR
 import { createDemoVessel } from '../data/demoVessel';
 import { createEmergencyEvent, createVesselEvent, nowClock } from '../domain/events';
 import { requestVesselAgent } from '../services/agentClient';
+import { interpretLocally } from '../domain/fallback';
 import {
   connectToPlatform,
   fetchPlatformStatus,
@@ -25,6 +26,7 @@ interface VesselStore {
   acknowledgement: PlatformAcknowledgement | null;
   partialTranscript: string;
   typedOpen: boolean;
+  heardDraft: string;
   agentUnavailable: boolean;
   speechPermission: SpeechPermissionState;
   lastError: string | null;
@@ -84,6 +86,7 @@ export const VesselProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [acknowledgement, setAcknowledgement] = useState<PlatformAcknowledgement | null>(null);
   const [partialTranscript, setPartialTranscript] = useState('');
   const [typedOpen, setTypedOpen] = useState(false);
+  const [heardDraft, setHeardDraft] = useState('');
   const [agentUnavailable, setAgentUnavailable] = useState(false);
   const [speechPermission, setSpeechPermission] = useState<SpeechPermissionState>('undetermined');
   const [lastError, setLastError] = useState<string | null>(null);
@@ -120,12 +123,12 @@ export const VesselProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setPending({ response, captainText });
         setInteraction('CONFIRMATION_REQUIRED');
         pulseWarn();
-        await speakReply(response.message, response.speak);
+        void speakReply(response.message, response.speak);
         return;
       }
 
       setInteraction('IDLE');
-      await speakReply(response.message, response.speak);
+      void speakReply(response.message, response.speak);
     },
     [pushHistory, speakReply]
   );
@@ -159,6 +162,7 @@ export const VesselProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const handleSendText = useCallback(
     async (text: string) => {
       setTypedOpen(true);
+      setHeardDraft('');
       await interpret(text, 'typed');
     },
     [interpret]
@@ -176,7 +180,16 @@ export const VesselProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setInteraction('IDLE');
         return;
       }
-      await interpret(result.text, result.provider === 'apple-speech' ? 'apple-speech' : 'typed');
+      const heard = result.text.trim();
+      const local = interpretLocally(heard, pendingClarification.current);
+      setHeardDraft(heard);
+      setTypedOpen(true);
+      if (local.intent === 'UNKNOWN') {
+        setLastError(`I heard: “${heard}”. Correct it if Safari missed a word, then send.`);
+        setInteraction('IDLE');
+        return;
+      }
+      await interpret(heard, result.provider === 'apple-speech' ? 'apple-speech' : 'typed');
       return;
     }
 
@@ -229,7 +242,13 @@ export const VesselProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const isEmergency = response.proposedEvent.type === 'VESSEL_EMERGENCY_TRIGGERED';
       const event =
         response.proposedEvent.type === 'VESSEL_EMERGENCY_TRIGGERED'
-          ? createEmergencyEvent(vessel)
+          ? createEmergencyEvent(
+              vessel,
+              response.proposedEvent.incidentType === 'PROPULSION_FAILURE' ||
+                response.proposedEvent.incidentType === 'FLOODING'
+                ? response.proposedEvent.incidentType
+                : 'MANEUVERABILITY_LOST'
+            )
           : createVesselEvent(
               response.proposedEvent.type as VesselEventType,
               vessel,
@@ -343,6 +362,7 @@ export const VesselProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setPending(null);
     setAcknowledgement(null);
     setPartialTranscript('');
+    setHeardDraft('');
     setAgentUnavailable(false);
     setLastError(null);
     setPlatformStatusLabel('Connected');
@@ -409,6 +429,7 @@ export const VesselProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       acknowledgement,
       partialTranscript,
       typedOpen,
+      heardDraft,
       agentUnavailable,
       speechPermission,
       lastError,
@@ -448,6 +469,7 @@ export const VesselProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       handleRequestSpeech,
       handleReset,
       handleSendText,
+      heardDraft,
       history,
       interaction,
       lastError,

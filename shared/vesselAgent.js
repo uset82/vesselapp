@@ -9,6 +9,9 @@ const interpretCaptainMessage = async ({ message, vessel, conversation, pendingC
     latestConfirmedReports: vessel?.latestConfirmedReports || [],
   });
   const fallback = interpretWithFallback(message, pendingClarification);
+  if (fallback.intent !== 'UNKNOWN') {
+    return { response: fallback, context, source: 'fallback' };
+  }
 
   try {
     const modelResult = await askVesselAgentWithSdk({
